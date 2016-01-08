@@ -136,6 +136,7 @@ switch method
         topoplot(fd_values_avg-mean(fd_values_avg), EEG.chanlocs(chans_list));
         a = strcat('FD Averaged over Epochs: ',EEG.setname);
         title(a)
+        colorbar()
         
         cd(folder_name)
         aa = strcat('FD values_',EEG.setname,'.mat');
@@ -148,17 +149,7 @@ switch method
         %save EPOCH DATA FIX ME
         
         cd(original_folder_name)
-%         if smooth == 1
-%             fd_values_avg = zeros(1,size_mat(1));
-%             for k=1:num_of_chans % channels
-%                 smooth_fd_values_avg(k) = mean(smooth(fd_values_mat(k,:)));
-%             end
-%             topoplot(smooth_fd_values_avg-mean(smooth_fd_values_avg), EEG.chanlocs);
-%             a = strcat('Smoothed FD of averaged data: ',EEG.setname);
-%             title(a)
-%         end
-%         
-        
+
     case 'avg'
         for k=1:num_of_chans % channels
             y.chan(chans_list(k)).data = zeros(1,size_mat(2));
@@ -189,6 +180,7 @@ switch method
         topo_data = fd_values_avg-mean(fd_values_avg);
         topoplot(topo_data, EEG.chanlocs(chans_list));
         title(a)
+        colorbar()
         
         overall_mean = mean(fd_values_avg)
         use_subset = 0;
@@ -235,6 +227,7 @@ switch method
         topo_data = fd_values_conc-mean(fd_values_conc);
         topoplot(topo_data, EEG.chanlocs(chans_list));
         title(a)
+        colorbar()
         
         cd(folder_name)
         %a2 = strcat(a,'.mat')
@@ -271,10 +264,10 @@ switch method
         end
         
        
-        for i=1:size_mat(1) %num of channels
-            fd_window_mean = fd_mean_mat(j,:);
+        for j=1:num_of_chans %num of channels
+            fd_window_mean(j) = mean(fd_mean_mat(j,:));
         end
-        
+       
         %h=1:length(fd_mean_mat);
         h = linspace(0,length(EEG.times)/EEG.srate,length(fd_mean_mat));
         figure
@@ -290,7 +283,7 @@ switch method
         topoplot(fd_window_mean-mean(fd_window_mean), EEG.chanlocs(chans_list));
         title('FD Topoplot')
         colormap('default')
-        colobar
+        colorbar()
         
         disp('Saving data matrices in folder');
         save('fd_channel_means_overtime.mat','fd_mean_mat');

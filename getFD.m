@@ -12,10 +12,10 @@ TT = length(time_data);
 if TT == 2^nextpow2(TT)
     powertwo = nextpow2(TT);
 else
-    powertwo = nextpow2(TT) - 1;
+    powertwo = nextpow2(TT);
 end
 bins = powertwo - 2;
-databins = 2^(bins+2);
+databins = 2^(bins+2)-1;
 
 % Fractal Dimension computation:
 switch method

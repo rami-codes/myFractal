@@ -76,15 +76,20 @@ end
 
 window_increment = str2num(structout.window_overlap)*window_size;
 if (str2num(structout.window_size) < window_increment)
-   error('The size of the window must be greater than the window increment size. See documentation for more help.')
+    error('The size of the window must be greater than the window increment size. See documentation for more help.')
 end
 
 method_list = {'avg_fd' 'avg' 'concat' 'window'};
 method = method_list{structout.fd_method};
-if length(size_mat) > 2
-    epochs = size_mat(3);
+
+if (length(size_mat) < 3)
+    size_mat(3) = 1;
 end
-chans_list
+
+epochs = size_mat(3);
+
+disp('Using the following channels: ')
+disp(chans_list)
 switch method
     case 'avg_fd'
         for i=1:size_mat(3) % epochs
@@ -143,17 +148,7 @@ switch method
         %save EPOCH DATA FIX ME
         
         cd(original_folder_name)
-%         if smooth == 1
-%             fd_values_avg = zeros(1,size_mat(1));
-%             for k=1:num_of_chans % channels
-%                 smooth_fd_values_avg(k) = mean(smooth(fd_values_mat(k,:)));
-%             end
-%             topoplot(smooth_fd_values_avg-mean(smooth_fd_values_avg), EEG.chanlocs);
-%             a = strcat('Smoothed FD of averaged data: ',EEG.setname);
-%             title(a)
-%         end
-%         
-        
+
     case 'avg'
         for k=1:num_of_chans % channels
             y.chan(chans_list(k)).data = zeros(1,size_mat(2));
@@ -266,15 +261,15 @@ switch method
         end
         
        
-        for i=1:size_mat(1) %num of channels
-            fd_window_mean = fd_mean_mat(j,:);
+        for j=1:num_of_chans %num of channels
+            fd_window_mean = mean(fd_mean_mat(j,:));
         end
-        
+       
         %h=1:length(fd_mean_mat);
-        h = linspace(0,length(EEG.times)/srate,length(fd_mean_mat));
+        h = linspace(0,length(EEG.times)/EEG.srate,length(fd_mean_mat));
         figure
         plot(h,fd_mean_mat')
-        xlim([0 length(EEG.times)/srate])
+        xlim([0 length(EEG.times)/EEG.srate])
         a = strcat('Windowed FD of Epoched Data: ',EEG.setname);
         title(a)
         xlabel('Time')
@@ -284,6 +279,8 @@ switch method
         figure
         topoplot(fd_window_mean-mean(fd_window_mean), EEG.chanlocs(chans_list));
         title('FD Topoplot')
+        colormap('default')
+        colobar
         
         disp('Saving data matrices in folder');
         save('fd_channel_means_overtime.mat','fd_mean_mat');
